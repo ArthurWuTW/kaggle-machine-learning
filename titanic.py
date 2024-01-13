@@ -60,8 +60,8 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None, n_jobs=1,
         plt.title(title)
         if ylim is not None:
             plt.ylim(*ylim)
-        plt.xlabel("number of training dataset")
-        plt.ylabel("score")
+        plt.xlabel("number of samples in the training set")
+        plt.ylabel("Acuracy")
         plt.gca().invert_yaxis()
         plt.grid()
 
@@ -109,4 +109,6 @@ score = cross_val_score(clf, x, y, cv=5, scoring='accuracy')
 print(score)
 print(score.mean())
 
-plot_learning_curve(clf, "learning curve", x, y)
+print(train.info())
+
+plot_learning_curve(clf, "learning curve", x, y, cv=5)
