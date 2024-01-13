@@ -4,6 +4,9 @@ from sklearn import preprocessing
 from sklearn import linear_model
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import learning_curve
+import matplotlib.pyplot as plt
+
 
 
 def set_numeralization(data, labelArray, labelEncoderArray):
@@ -42,6 +45,39 @@ def set_missing_age(df):
     df.loc[(df.Age.isnull()),'Age'] = predictedAges
     return df
 
+def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None, n_jobs=1,
+                        train_sizes=np.linspace(.05, 1.0, 20), verbose=0, plot=True):
+    train_sizes, train_scores, test_scores = learning_curve(
+        estimator, X, y, cv=cv, n_jobs=n_jobs, train_sizes=train_sizes, verbose=verbose)
+
+    train_scores_mean = np.mean(train_scores, axis=1)
+    train_scores_std = np.std(train_scores, axis=1)
+    test_scores_mean = np.mean(test_scores, axis=1)
+    test_scores_std = np.std(test_scores, axis=1)
+
+    if plot:
+        plt.figure()
+        plt.title(title)
+        if ylim is not None:
+            plt.ylim(*ylim)
+        plt.xlabel("number of training dataset")
+        plt.ylabel("score")
+        plt.gca().invert_yaxis()
+        plt.grid()
+
+        plt.fill_between(train_sizes, train_scores_mean - train_scores_std, train_scores_mean + train_scores_std,
+                         alpha=0.1, color="b")
+        plt.fill_between(train_sizes, test_scores_mean - test_scores_std, test_scores_mean + test_scores_std,
+                         alpha=0.1, color="r")
+        plt.plot(train_sizes, train_scores_mean, 'o-', color="b", label=u"training dataset score")
+        plt.plot(train_sizes, test_scores_mean, 'o-', color="r", label=u"cross validation score")
+
+        plt.legend(loc="best")
+
+        plt.draw()
+        plt.gca().invert_yaxis()
+        plt.show()
+
 train = pd.read_csv('titanic/train.csv')
 test = pd.read_csv('titanic/test.csv')
 
@@ -72,3 +108,5 @@ clf.fit(x,y)
 score = cross_val_score(clf, x, y, cv=5, scoring='accuracy')
 print(score)
 print(score.mean())
+
+plot_learning_curve(clf, "learning curve", x, y)
